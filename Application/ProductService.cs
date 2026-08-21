@@ -8,33 +8,39 @@ namespace _7_Lagerverwaltung.Application;
 
 internal class ProductService
 {
-    public static Dictionary<Product, int> products = new Dictionary<Product, int>();
+    public static List<Product> products = new List<Product>();
 
-    public static bool AddProduct(Product prod, int amount)
+    public static bool ProductExists(string description)
     {
-        if (ProductFileManager.GetProducts().ContainsKey(prod))
+        return ProductFileManager.GetProducts()
+            .Exists(prod => string.Equals(prod.Description.ToLower(), description.ToLower()));
+    }
+
+    public static bool AddProduct(Product prod)
+    {
+        if (ProductExists(prod.Description))
         {
             throw new Exception("Error: Produkt existiert schon.");
         }
         else
         {
-            products.Add(prod, amount);
+            products.Add(prod);
             return true;
         }
     }
 
-    public static bool AddStock(Product prod, int amount)
+    public static bool AddStock(string desc, int amount)
     {
-        if (ProductFileManager.GetProducts().ContainsKey(prod))
+        List<Product> products = ProductFileManager.GetProducts();
+        Product? product = products.Find(prod => string.Equals(prod.Description.ToLower() desc.ToLower()));
+
+        if (product == null)
         {
-            int previousAmount = ProductFileManager.GetProducts()[prod];
-            products.Remove(prod);
-            products.Add(prod, previousAmount + amount);
-            return true;
+            throw new Exception("Error: Produkt existiert noch nicht.");
         }
-        else
-        {
-            throw new Exception("Error: Produkt existiert schon.");
-        }
+
+        product.Stock += amount;
+        ProductFileManager.SaveProducts(products, false);
+        return true;
     }
 }

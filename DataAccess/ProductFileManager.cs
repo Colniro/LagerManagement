@@ -7,20 +7,20 @@ namespace _7_Lagerverwaltung.DataAccess;
 
 internal class ProductFileManager
 {
-    public static void SaveProducts(Dictionary<Product, int> items, bool append)
+    public static void SaveProducts(List<Product> items, bool append)
     {
         using (StreamWriter sw = new StreamWriter("products.csv", append))
         {
-            foreach(var key in items.Keys)
+            foreach (Product product in items)
             {
-                sw.WriteLine($"{key.ProductNumber}; {key.Description}; {key.Stock}; {key.Price}; {items[key]}");
+                sw.WriteLine($"{product.ProductNumber}; {product.Description}; {product.Stock}; {product.Price}");
             }
         }
     }
 
-    public static Dictionary<Product, int> GetProducts()
+    public static List<Product> GetProducts()
     {
-        Dictionary<Product, int> output = new Dictionary<Product, int>();
+        List<Product> output = new List<Product>();
 
         using (StreamReader sr = new StreamReader("products.csv"))
         {
@@ -28,32 +28,16 @@ internal class ProductFileManager
             while ((line = sr.ReadLine()) != null)
             {
                 string[] current = line.Split(";");
-                Product currentProduct = new Product(int.Parse(current[0]), current[1], int.Parse(current[3]), decimal.Parse(current[4]));
-                output.Add(currentProduct, int.Parse(current[^1]));
+                Product currentProduct = new Product(int.Parse(current[0]), current[1].Trim(), int.Parse(current[2]), decimal.Parse(current[3]));
+                output.Add(currentProduct);
             }
         }
 
         return output;
     }
 
-    public static Dictionary<Product, int> GetProductsBelowMinStock()
+    public static List<Product> GetProductsBelowMinStock()
     {
-        Dictionary<Product, int> output = new Dictionary<Product, int>();
-
-        using (StreamReader sr = new StreamReader("products.csv"))
-        {
-            string? line = null;
-            while ((line = sr.ReadLine()) != null)
-            {
-                string[] current = line.Split(";");
-                if (int.Parse(current[^1]) < Product._MinStock)
-                {
-                    Product currentProduct = new Product(int.Parse(current[0]), current[1], int.Parse(current[3]), decimal.Parse(current[4]));
-                    output.Add(currentProduct, int.Parse(current[^1]));
-                }
-            }
-        }
-
-        return output;
+        return GetProducts().FindAll(p => p.Stock < Product._MinStock);
     }
 }
