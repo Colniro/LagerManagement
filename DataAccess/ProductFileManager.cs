@@ -22,6 +22,11 @@ internal class ProductFileManager
     {
         List<Product> output = new List<Product>();
 
+        if (!File.Exists("products.csv"))
+        {
+            return output;
+        }
+
         using (StreamReader sr = new StreamReader("products.csv"))
         {
             string? line = null;
