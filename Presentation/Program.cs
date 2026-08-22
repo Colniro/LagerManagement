@@ -16,13 +16,16 @@ while (true)
                 AddNewProduct();
                 break;
             case 2:
-                ShowAllProducts();
+                RemoveProductByNumber();
                 break;
             case 3:
                 AddStockToProduct();
                 break;
+            case 4:
+                ShowAllProducts();
+                break;
             case 5:
-                RemoveProductByNumber();
+                ShowAllProductsBelowMinStock();
                 break;
 
         }
@@ -45,10 +48,10 @@ void WriteSelection()
     Console.WriteLine("Was möchten Sie machen?");
     Console.WriteLine("-------------------------\n");
     Console.WriteLine("- Neues Produkt hinzufügen                                (1)" );
-    Console.WriteLine("- Alle Produkte anzeigen                                  (2)");
+    Console.WriteLine("- Produkt entfernen                                       (2)");
     Console.WriteLine("- Bestand eines Produktes erhöhen oder verringern         (3)");
-    Console.WriteLine("- Produkte mit unterschrittenem Mindestbestand anzeigen   (4)");
-    Console.WriteLine("- Produkt entfernen                                       (5)\n");
+    Console.WriteLine("- Alle Produkte anzeigen                                  (4)");
+    Console.WriteLine("- Produkte mit unterschrittenem Mindestbestand anzeigen   (5)\n");
     Console.Write("Auswahl: ");
 }
 
@@ -71,7 +74,7 @@ void AddNewProduct()
         inputProductNumber = Console.ReadLine();
         if (!int.TryParse(inputProductNumber, out parsedProductNumber) || parsedProductNumber < 0)
         {
-            Console.WriteLine("Error: Ungültige Eingabe.");
+            Console.WriteLine("Error: Ungültige Eingabe.\n");
         }
     }
     while (!int.TryParse(inputProductNumber, out parsedProductNumber) || parsedProductNumber < 0);
@@ -133,6 +136,7 @@ void AddNewProduct()
         Product currentProduct = new Product(productNumber, description, stock, price);
         ProductService.AddProduct(currentProduct);
         ProductFileManager.SaveProducts(ProductService.products, append);
+        ProductService.products.Clear();
         Console.WriteLine("Erfolgreich. Enter zum fortfahren...");
         Console.ReadLine();
     }
@@ -149,6 +153,44 @@ void ShowAllProducts()
     Console.Clear();
     WriteTitle();
     foreach (var item in ProductFileManager.GetProducts())
+    {
+        Console.Write($"Nummer: {item.ProductNumber}");
+        for (int i = 0; i < 9 - item.ProductNumber.ToString().Length; i++)
+        {
+            Console.Write(" ");
+        }
+        Console.Write("| ");
+
+        Console.Write($"Name: {item.Description}");
+        for (int i = 0; i < 20 - item.Description.ToString().Length; i++)
+        {
+            Console.Write(" ");
+        }
+        Console.Write("| ");
+
+        Console.Write($"Anzahl: {item.Stock}");
+        for (int i = 0; i < 9 - item.Stock.ToString().Length; i++)
+        {
+            Console.Write(" ");
+        }
+        Console.Write("| ");
+
+        Console.Write($"Preis: {item.Price}");
+        for (int i = 0; i < 6 - item.Price.ToString().Length; i++)
+        {
+            Console.Write(" ");
+        }
+        Console.WriteLine("\n");
+    }
+    Console.WriteLine("\nEnter um zu schliessen...");
+    Console.ReadLine();
+}
+
+void ShowAllProductsBelowMinStock()
+{
+    Console.Clear();
+    WriteTitle();
+    foreach (var item in ProductFileManager.GetProductsBelowMinStock())
     {
         Console.Write($"Nummer: {item.ProductNumber}");
         for (int i = 0; i < 9 - item.ProductNumber.ToString().Length; i++)

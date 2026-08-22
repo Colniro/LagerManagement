@@ -32,6 +32,11 @@ internal class ProductFileManager
             string? line = null;
             while ((line = sr.ReadLine()) != null)
             {
+                if (string.IsNullOrWhiteSpace(line))
+                {
+                    continue;
+                }
+
                 string[] current = line.Split(";");
                 Product currentProduct = new Product(int.Parse(current[0]), current[1].Trim(), int.Parse(current[2]), decimal.Parse(current[3]));
                 output.Add(currentProduct);

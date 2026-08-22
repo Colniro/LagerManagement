@@ -25,7 +25,7 @@ internal class ProductService
     {
         if (ProductExists(prod.Description) || ProductNumberExists(prod.ProductNumber))
         {
-            throw new Exception("Error: Produkt oder Produktnummer existiert schon.");
+            throw new Exception("------------------------------------------------------------\nError: Produkt oder Produktnummer existiert schon.\n------------------------------------------------------------");
         }
         else
         {
